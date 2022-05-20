@@ -10,12 +10,22 @@ def voting(Ballot, accounts):
 
 
 @pytest.fixture
+def voting_voter1(accounts):
+    yield accounts[1]  # 投票人
+
+
+@pytest.fixture
 def voting_voter(accounts):
-    # msg.sender = accounts[2]
     yield accounts[2]  # 投票人
 
 
 @pytest.fixture
 def voting_delegate(accounts):
-    yield accounts[3]  # 被委托人
+    yield accounts[3]  # 投票人&被委托人
+
+
+@pytest.fixture
+def proposal1():
+    proposal = 0  # 第一个提案索引
+    yield proposal
 

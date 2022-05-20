@@ -44,7 +44,6 @@ def test_give_right_to_vote(voting, accounts, accounts_index):
 
 
 # 委托投票
-# @pytest.mark.skip()
 def test_delegate(voting, voting_voter, voting_delegate):
     voter2 = voting.voters(voting_voter)
     voter3 = voting.voters(voting_delegate)  # 保证委托人未委托他人
@@ -53,27 +52,33 @@ def test_delegate(voting, voting_voter, voting_delegate):
     assert voter3[2] == '0x0000000000000000000000000000000000000000'  # 委托人的委托地址为空
     assert voter3[0] >= 1  # 检查被委托人的权重大于等于1
     voting.delegate(voting_delegate, {"from": voting_voter})  # accounts[2]投票权委托给accounts[3]
+    # print("voting_voter-->", voting.voters(voting_voter))
+    voter2 = voting.voters(voting_voter)  # 执行委托操作后，voter2和voter3的值有变化，需要重新赋值
+    voter3 = voting.voters(voting_delegate)
     assert voter2[1] is True
     assert voter3[0] == 2
 
 
 # 投票
-@pytest.mark.skip()
-def test_vote(voting, accounts):
-    print("accounts_weight-->", voting.voters(accounts[1])[0])
-    sender = voting.voters[accounts[1]]
-    assert sender[0] != 0
-    assert sender[1] is False
-    # sender[1] = 1
-    sender[3] = voting.proposals[0].voteCount
+def test_vote(voting, voting_voter1, proposal1):
+    assert voting.voters(voting_voter1)[0] >= 1  # 选民有投票权
+    assert voting.voters(voting_voter1)[1] is False  # 选民未投票
+    proposal1_count = voting.proposals(proposal1)[1]  # 未投票前提案的总票数
+    voting.vote(proposal1, {"from": voting_voter1})  # 选民voting_voter1投票
+
+    assert voting.voters(voting_voter1)[1] is True  # 选民已投票
+    assert voting.proposals(proposal1)[1] == proposal1_count + voting.voters(voting_voter1)[0]  # 提案proposal1的总投票数增加
 
 
 # 获胜提案索引值
-def test_winning_proposal():
-    pass
+def test_winning_proposal(voting, proposal1):
+    # name = voting.winnerName()
+    # print("winningProposal-->", voting.winningProposal(), bytes.decode(name), voting.proposals(proposal1)[1])
+    assert voting.winningProposal() == 0  # 提案列表中仅有一个提案
+    assert voting.proposals(proposal1)[1] == 1  # proposal1提案有一票
 
 
 # 获胜提案的名称
-def test_winner_name():
-    pass
-
+def test_winner_name(voting):
+    name = bytes.decode(voting.winnerName()[-3:])
+    assert name == "foo"
