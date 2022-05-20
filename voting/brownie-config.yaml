@@ -1,0 +1,33 @@
+networks:
+  default: development
+  development:
+    gas_limit: max
+    gas_buffer: 1
+    gas_price: 0
+    reverting_tx_gas_limit: max
+    default_contract_owner: true
+    cmd_settings: null
+  live:
+    gas_limit: auto
+    gas_buffer: 1.1
+    gas_price: auto
+    reverting_tx_gas_limit: false
+    default_contract_owner: false
+
+compiler:
+  solc:
+    version: null
+    optimizer:
+      enabled: true
+      runs: 200
+
+# exclude SafeMath when calculating test coverage
+# https://eth-brownie.readthedocs.io/en/v1.10.3/config.html#exclude_paths
+reports:
+  exclude_contracts:
+    - SafeMath
+
+dependencies:
+  - OpenZeppelin/openzeppelin-contracts@3.4.1-solc-0.7-2
+dev_deployment_artifacts:
+  - true
